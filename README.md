@@ -1,0 +1,1 @@
+# wazuh-cisco-router-logs
