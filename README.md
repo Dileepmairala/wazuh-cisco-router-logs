@@ -140,6 +140,12 @@ sudo vi /var/ossec/etc/ossec.conf
     <log_format>syslog</log_format>
     <location>/var/log/cisco/*.log</location>
   </localfile>
+  <localfile>
+    <log_format>syslog</log_format>
+    <location>/var/log/messages</location>
+  </localfile>
+
+ 
 </ossec_config>
 ```
 
