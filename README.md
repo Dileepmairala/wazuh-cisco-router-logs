@@ -108,6 +108,10 @@ Create the necessary directories for Cisco logs:
 sudo mkdir -p /var/log/cisco
 sudo chmod 755 /var/log/cisco
 sudo chown syslog:adm /var/log/cisco  # Adjust owner/group as needed
+
+
+##restart the rsyslog
+systemctl restart rsyslog
 ```
 
 ### Firewall Configuration
