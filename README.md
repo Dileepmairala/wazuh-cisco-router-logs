@@ -176,6 +176,35 @@ The custom decoders for Cisco router logs are configured in `/var/ossec/etc/deco
 </decoder>
 ```
 
+
+
+
+
+(same decoders)
+
+
+<!-- Decoder for VPN Authentication Logs -->
+<decoder name="cisco_router">
+  <prematch>log_sslvpnac|sslvpnd</prematch>
+  <regex>User\s+(\S+)\s+authenticated successfully|sbtg_authorize: ret 0\.</regex>
+  <order>user, event</order>
+</decoder>
+
+<!-- Decoder for AnyConnect VPN Logs -->
+<decoder name="cisco_router1">
+  <prematch>log_sslvpnac|sslvpnd</prematch>
+  <regex>anyconnect-vpn.*User\s+(\S+)|anyconnect-vpn.*group:vpnusers</regex>
+  <order>user</order>
+</decoder>
+
+<!-- Decoder for VPN Tunnel Establishment -->
+<decoder name="cisco_vpn_tunnel">
+  <prematch>sslvpn_tunl_main</prematch>
+  <regex>tunnel established successfully.*Tunnel IP:\\[(\S+)\\]</regex>
+  <order>tunnel_ip</order>
+</decoder>
+
+
 ### Custom Rules
 
 The corresponding alert rules are defined in `/var/ossec/etc/rules/local_rules.xml`:
@@ -198,6 +227,36 @@ The corresponding alert rules are defined in `/var/ossec/etc/rules/local_rules.x
     <group>vpn,authentication_success,</group>
   </rule>
 </group>
+
+(same rule but working coorect)
+ 
+<!-- Rule for VPN Login Success -->
+  <rule id="130300" level="15">
+    <decoded_as>cisco_router</decoded_as>
+    <match>authenticated successfully</match>
+    <description>Cisco VPN Login: User $(dstuser) connected to VPN</description>
+    <group>vpn,authentication_success,</group>
+  </rule>
+
+  <!-- Rule for AnyConnect VPN Authorization -->
+  <rule id="130301" level="0">
+    <decoded_as>cisco_router1</decoded_as>
+    <match>anyconnect-vpn</match>
+    <description>Cisco VPN Login: AnyConnect VPN authorization successful$(dstuser ? for user ${dstuser} : )</description>
+    <group>vpn,authentication_success,</group>
+  </rule>
+
+
+  <rule id="130306" level="5">
+    <decoded_as>cisco_vpn_session_termination</decoded_as>
+    <description>Cisco VPN: User $(dstuser) VPN connection terminated</description>
+    <group>vpn,authentication_terminated,</group>
+  </rule>
+
+
+
+
+
 ```
 
 5. Restart the Wazuh manager to apply the changes:
